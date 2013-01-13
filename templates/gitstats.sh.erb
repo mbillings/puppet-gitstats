@@ -1,0 +1,74 @@
+#!/bin/bash
+#
+# Managed by Puppet. All local changes will be overwritten.
+# Template located at <%= templatedir %>
+#
+# Pull in all git logs and commits for pretty stats output
+
+gsdir=<%= scope.lookupvar('gitstats::git_document_root') %>
+gswebdir=<%= scope.lookupvar('gitstats::document_root') %>
+port=<%= scope.lookupvar('gitstats::port') %>
+git_repos_dir=<%= scope.lookupvar('gitstats::git_repos_dir') %>
+all_repos_dir=<%= scope.lookupvar('gitstats:git_all_repos') %>
+server_name=<%= scope.lookupvar('gitstats::server_name') %>
+
+# remove the index, this will be rebuilt to track any new puppet modules
+rm -f $gswebdir/index.html
+
+
+# But first, clone/pull gitstats
+if [ `ls $gsdir | wc -l` -eq 0 ]
+then	cd $gsdir 
+	git clone git://github.com/hoxu/gitstats.git
+else	cd $gsdir
+	#git pull origin master
+fi
+
+# go into the all-repos directory
+cd $all_repos_dir
+
+
+# If the all-repos directory is not a git repo, initialize it
+if [ ! -e .git ]
+then git init . 
+fi
+
+
+# Within the all-repos dummy repo, add any new puppet module repos, then pull and add/commit (if necessary)
+for i in `ls $git_repos_dir | grep "^puppet-"`
+do 
+  exists=`git remote -v | grep "$server_name:$i" | wc -l`
+  if [ "$exists" -eq 0 ]
+  then git remote add $i $git_repos_dir/$i
+  fi
+  
+  git pull $i master
+  git add .
+  git commit -am "dummy commit for git stats"
+done
+
+
+# in the gitstats directory, run gitstats on the all-repos dummy repo and output to the gitstats web directory
+cd $gsdir
+./gitstats $all_repos_dir $gswebdir/all-repos
+echo "<head><b>Git Stats per puppet module</b></head>" >> $gswebdir/index.html
+echo "<p><a href=\"https://$server_name:$port/all-repos\">all-repos</a href></p>" >> $gswebdir/index.html
+
+
+# make sure the gitstats web directory exists first
+mkdir -p $gswebdir
+
+
+# for all "puppet=" prefixed modules:
+modules=`ls $git_repos_dir | grep ^puppet- | sed s@^puppet-@@g | sed s@.git@@ | sort`
+
+
+# 1. rebuild the index to include any new entries
+for i in `echo $modules`; do echo "<p><a href=\"https://$server_name:$port/$i\">$i</a href></p>" >> $gswebdir/index.html; done
+
+
+# 2. auto-create directories for new modules without the "puppet-" prefix and ".git" suffix for typability
+# 3. run gitstats on each directory to gather info
+for i in `echo $modules`; do mkdir -p $gswebdir/$i && ./gitstats $git_repos_dir/puppet-$i.git $gswebdir/$i; done
+
+# all done! Now browse to https://$server_name:$port to see all statistics on your repos
