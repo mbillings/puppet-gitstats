@@ -11,12 +11,13 @@ A parameterized Puppet module for auto-deploying (https://github.com/hoxu/gitsta
 - Conglomerates statistics on your repos
 
 ## Landing page
-(https://raw.github.com/mbillings/puppet-gitstats/master/pics/gitstats_landing_page.jpg "Gitstats auto-created landing page")
+![Gitstats auto-created landing page](https://raw.github.com/mbillings/puppet-gitstats/master/pics/gitstats_landing_page.jpg "Gitstats auto-created landing page")
 
 ## General info
-(https://raw.github.com/mbillings/puppet-gitstats/master/pics/gitstats_all-puppet-modules_overview.jpg "All repos overview")
+![All repos overview](https://raw.github.com/mbillings/puppet-gitstats/master/pics/gitstats_all-puppet-modules_overview.jpg "All repos overview")
+
 ## Activity
-(https://raw.github.com/mbillings/puppet-gitstats/master/pics/gitstats_activity.jpg "Gitstats activity for all repos")
+![Gitstats activity for all repos](https://raw.github.com/mbillings/puppet-gitstats/master/pics/gitstats_activity.jpg "Gitstats activity for all repos")
 
 ## Requirements
 
