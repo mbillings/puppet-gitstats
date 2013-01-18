@@ -49,7 +49,7 @@ class gitstats::config
          content => template("gitstats/gitstats-apache.conf.erb");
        }
 
-  # Schedule gitstats to pull once an hour during working days and working hours
+  # Schedule gitstats to pull once an hour during working hours of working days
   cron { "Run gitstats once per hour":
          ensure  => present,
          command => "nice -10 /usr/local/sbin/gitstats.sh",

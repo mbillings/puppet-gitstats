@@ -12,7 +12,7 @@ git_repos_dir=<%= scope.lookupvar('gitstats::git_repos_dir') %>
 all_repos_dir=<%= scope.lookupvar('gitstats:git_all_repos') %>
 server_name=<%= scope.lookupvar('gitstats::server_name') %>
 
-# remove the index, this will be rebuilt to track any new puppet modules
+# remove the index, this will be rebuilt to track any new modules
 rm -f $gswebdir/index.html
 
 
@@ -34,8 +34,8 @@ then git init .
 fi
 
 
-# Within the all-repos dummy repo, add any new puppet module repos, then pull and add/commit (if necessary)
-for i in `ls $git_repos_dir | grep "^puppet-"`
+# Within the all-repos dummy repo, add any new module repos, then pull and add/commit (if necessary)
+for i in `ls $git_repos_dir` 
 do 
   exists=`git remote -v | grep "$server_name:$i" | wc -l`
   if [ "$exists" -eq 0 ]
@@ -51,7 +51,7 @@ done
 # in the gitstats directory, run gitstats on the all-repos dummy repo and output to the gitstats web directory
 cd $gsdir
 ./gitstats $all_repos_dir $gswebdir/all-repos
-echo "<head><b>Git Stats per puppet module</b></head>" >> $gswebdir/index.html
+echo "<head><b>Git Stats per module</b></head>" >> $gswebdir/index.html
 echo "<p><a href=\"https://$server_name:$port/all-repos\">all-repos</a href></p>" >> $gswebdir/index.html
 
 
@@ -59,16 +59,16 @@ echo "<p><a href=\"https://$server_name:$port/all-repos\">all-repos</a href></p>
 mkdir -p $gswebdir
 
 
-# for all "puppet=" prefixed modules:
-modules=`ls $git_repos_dir | grep ^puppet- | sed s@^puppet-@@g | sed s@.git@@ | sort`
+# for all moduls:
+modules=`ls $git_repos_dir | sort`
 
 
 # 1. rebuild the index to include any new entries
 for i in `echo $modules`; do echo "<p><a href=\"https://$server_name:$port/$i\">$i</a href></p>" >> $gswebdir/index.html; done
 
 
-# 2. auto-create directories for new modules without the "puppet-" prefix and ".git" suffix for typability
+# 2. auto-create directories for new modules
 # 3. run gitstats on each directory to gather info
-for i in `echo $modules`; do mkdir -p $gswebdir/$i && ./gitstats $git_repos_dir/puppet-$i.git $gswebdir/$i; done
+for i in `echo $modules`; do mkdir -p $gswebdir/$i && ./gitstats $git_repos_dir/$i.git $gswebdir/$i; done
 
 # all done! Now browse to https://$server_name:$port to see all statistics on your repos
