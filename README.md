@@ -1,7 +1,7 @@
 puppet-gitstats
 ===============
 
-A parameterized Puppet module for auto-deploying ![gitstats](https://github.com/hoxu/gitstats "gitstats") on a RHEL-based distro. 
+A parameterized Puppet module for auto-deploying [gitstats](https://github.com/hoxu/gitstats) on a RHEL-based distro. 
 
 ## What does this module do?
 
